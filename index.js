@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 const express = require('express');
 const app = express();
@@ -153,9 +152,28 @@ function security(req, res, next){
     }
 }
 
-app.get('/', (req, res) => {
-    res.json({ asd: 'asd' });
-})
+
+
+const nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.USER_MAIL,
+        pass: process.env.PASSWORD_MAIL
+    }
+});
+
+app.post('/emailSend', (req, res) => {
+    const { code, email } = req.body;
+
+    transporter.sendMail({
+        from: process.env.USER_MAIL,
+        to: email,
+        subject: 'Verification code number of forgot password',
+        text: "Your OTP verification code number "+code
+    }, (err, info) => {});
+    res.json({ response: 'success' });
+});
 
 app.listen(( process.env.PORT || 4202 ));
 

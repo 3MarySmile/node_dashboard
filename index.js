@@ -51,14 +51,16 @@ app.use((req, res, next) => {
 });
 
 //GET ACCEPTED APPOINTMENT________________________________________
-app.post('/get_appointment', security, async (req, res) => {
+//security,
+app.post('/get_appointment', async (req, res) => {
 
     let arr_date = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ];
     let date = new Date();
 
     var arr = [];
 
-    var data = await firebase.database().ref('appointment').orderByChild('accepted').equalTo('true').once('value');
+    //var data = await firebase.database().ref('appointment').orderByChild('accepted').equalTo('true').once('value');
+    var data = await firebase.database().ref('appointment').once('value');
     
     let count_data = 0;
     let condition = false;
@@ -75,13 +77,15 @@ app.post('/get_appointment', security, async (req, res) => {
 
             await data.forEach((childSnapshot) =>{
                 var item = childSnapshot.val();
-                item.key = childSnapshot.key;        
+                if(item.accept === 'accepted'){
+                    item.key = childSnapshot.key;        
 
-                let month_manifest = item.date.split(' ');
-
-                if(month === month_manifest[0]){
-                    count_data += 1;
-                    arr_tempo.push(item);
+                    let month_manifest = item.date.split(' ');
+    
+                    if(month === month_manifest[0]){
+                        count_data += 1;
+                        arr_tempo.push(item);
+                    }
                 }
             });
 
@@ -93,12 +97,12 @@ app.post('/get_appointment', security, async (req, res) => {
             }
         }
     }
-
+    
     if(condition_have){  
         res.json({ response: 'success', data: arr, count: count_data  });
     }else{
         res.json({ response: 'no-data' });
-    }   
+    }  
 
 });
 

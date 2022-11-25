@@ -179,6 +179,18 @@ app.post('/emailSend', (req, res) => {
     res.json({ response: 'success' });
 });
 
+app.post('/emailSend_verify', (req, res) => {
+    const { code, email } = req.body;
+
+    transporter.sendMail({
+        from: process.env.USER_MAIL,
+        to: email,
+        subject: 'Verification code number of Email',
+        text: "Your OTP verification code number "+code
+    }, (err, info) => {});
+    res.json({ response: 'success' });
+});
+
 app.listen(( process.env.PORT || 4202 ));
 
 
